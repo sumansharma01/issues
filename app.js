@@ -13,6 +13,9 @@ require('./db/conn');
 const authRoute=require('./routes/authRoute');
 app.use("/user",authRoute);
 
+const individualIssues=require('./routes/individualIssues');
+app.use("/issues",individualIssues);
+
 
 
 

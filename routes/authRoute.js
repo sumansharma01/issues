@@ -1,6 +1,7 @@
 const router=require('express').Router();
 const User=require('../db/userModel');
 const bcrypt=require('bcrypt');
+const jwt=require('jsonwebtoken');
 
 
 //validation
@@ -46,7 +47,9 @@ router.post("/login",async (req,res,next)=>{
     if(!passwordValidate)
         return res.status(400).json({error:"Authentication failed"});
 
-    res.status(200).json({message:"Login successful"});
+    const token=jwt.sign({_id:user._id},process.env.JWT_KEY);
+    res.header('token',token);
+    res.status(200).json({message:"Login successful", token:token});
 })
 
 module.exports=router;
