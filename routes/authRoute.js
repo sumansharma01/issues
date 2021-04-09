@@ -12,8 +12,15 @@ router.post("/register",async (req,res,next)=>{
     if(error)
         return res.status(500).json({error:error.details[0].message});
     
+
+    //checking if the email exists
+    if(User.findOne({email:req.body.email}))
+        return res.status(500).json({error:"user already exists, please sign in"});
+
     const salt=await bcrypt.genSalt(10);
     const hashedPassword=await bcrypt.hash(req.body.password,salt);
+
+
     const user=new User({
         name:req.body.name,
         email:req.body.email,
@@ -26,8 +33,20 @@ router.post("/register",async (req,res,next)=>{
     
 })
 
-router.post("/login",(req,res,next)=>{
-    res.status(200).json({message:"hello from login post"});
+router.post("/login",async (req,res,next)=>{
+    const {error}=loginValidation(req.body);
+    if(error)
+        return res.status(500).json({error:error.details[0].message});
+
+    const user=await User.findOne({email:req.body.email});
+    if(!user)
+        return res.status(400).json({error:"Authentication failed"});
+
+    const passwordValidate=await bcrypt.compare(req.body.password,user.password);
+    if(!passwordValidate)
+        return res.status(400).json({error:"Authentication failed"});
+
+    res.status(200).json({message:"Login successful"});
 })
 
 module.exports=router;
