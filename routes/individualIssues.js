@@ -3,7 +3,7 @@ const verifyToken=require('../routes/verifyToken');
 const User=require('../db/userModel');
 const Issue=require('../db/issuesModel');
 
-router.get("/",verifyToken,async (req,res,next)=>{
+router.get("/individual",verifyToken,async (req,res,next)=>{
     const user=await User.findOne({_id:req.user._id});
     if(!user)
         return res.status(400).json({error:"Access denied!"});
@@ -14,7 +14,7 @@ router.get("/",verifyToken,async (req,res,next)=>{
     res.status(200).json(issue);
 } )
 
-router.post("/",verifyToken,async(req,res,next)=>{
+router.post("/individual/",verifyToken,async(req,res,next)=>{
     const user=await User.findOne({_id:req.user._id});
     if(!user)
         return res.status(400).json({error:"Access denied!"});
@@ -27,6 +27,11 @@ router.post("/",verifyToken,async(req,res,next)=>{
     issue.save().then(()=>res.status(200).json({message:"issue saved successfully"}))
     .catch((err)=>{res.status(500).json({message:"error while saving issue"})});
     // res.status(200).json(issue);
+})
+
+router.get("/",async(req,res,next)=>{
+    const issues=await Issue.find();
+    res.status(200).json({issues:issues});
 })
 
 
